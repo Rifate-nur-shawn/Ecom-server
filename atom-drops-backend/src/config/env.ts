@@ -8,7 +8,10 @@ dotenv.config();
 const envSchema = z.object({
   PORT: z.string().default('5000'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  // Add DATABASE_URL later when we set up Prisma
+  
+  // Add these new lines:
+  DATABASE_URL: z.string().url(),
+  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
 });
 
 // Validate the environment
