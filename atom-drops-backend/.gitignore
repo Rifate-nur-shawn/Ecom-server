@@ -14,6 +14,7 @@ yarn-error.log
 .env.test
 .env.production
 docker-compose.yml
+Dockerfile
 
 # ----------------------
 # 3. Build & Runtime Artifacts
@@ -21,16 +22,19 @@ docker-compose.yml
 dist/
 build/
 coverage/
+*.log
 
 # ----------------------
 # 4. OS & Editor Files (Noise)
 # ----------------------
 .DS_Store
 Thumbs.db
-.vscode/
+.vscode/settings.json
 .idea/
 
 # ----------------------
-# 5. Local Docker Volumes (If any)
+# 5. Database Files
 # ----------------------
+*.sqlite
+*.sqlite-journal
 pgdata/
