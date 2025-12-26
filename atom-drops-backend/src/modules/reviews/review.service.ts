@@ -1,9 +1,9 @@
-import { prisma } from '../../config/prisma.client';
+import { prisma } from "../../config/prisma.client";
 import {
   NotFoundError,
   BadRequestError,
   ForbiddenError,
-} from '../../shared/errors/app-error';
+} from "../../shared/errors/app-error";
 
 export const createReview = async (
   userId: string,
@@ -16,7 +16,7 @@ export const createReview = async (
     where: { id: productId },
   });
 
-  if (!product) throw new NotFoundError('Product not found');
+  if (!product) throw new NotFoundError("Product not found");
 
   // Check if user has already reviewed this product
   const existingReview = await prisma.review.findUnique({
@@ -29,7 +29,7 @@ export const createReview = async (
   });
 
   if (existingReview) {
-    throw new BadRequestError('You have already reviewed this product');
+    throw new BadRequestError("You have already reviewed this product");
   }
 
   // Optional: Check if user has purchased this product
@@ -38,14 +38,14 @@ export const createReview = async (
       product_id: productId,
       order: {
         user_id: userId,
-        status: 'DELIVERED',
+        status: "DELIVERED",
       },
     },
   });
 
   if (!hasPurchased) {
     throw new BadRequestError(
-      'You can only review products you have purchased'
+      "You can only review products you have purchased"
     );
   }
 
@@ -88,7 +88,7 @@ export const getProductReviews = async (
       where,
       skip,
       take: limit,
-      orderBy: { created_at: 'desc' },
+      orderBy: { created_at: "desc" },
       include: {
         user: {
           select: {
@@ -100,7 +100,7 @@ export const getProductReviews = async (
     }),
     prisma.review.count({ where }),
     prisma.review.groupBy({
-      by: ['rating'],
+      by: ["rating"],
       where: { product_id: productId },
       _count: true,
     }),
@@ -161,14 +161,14 @@ export const getReviewById = async (reviewId: string) => {
     },
   });
 
-  if (!review) throw new NotFoundError('Review not found');
+  if (!review) throw new NotFoundError("Review not found");
   return review;
 };
 
 export const getUserReviews = async (userId: string) => {
   return await prisma.review.findMany({
     where: { user_id: userId },
-    orderBy: { created_at: 'desc' },
+    orderBy: { created_at: "desc" },
     include: {
       product: {
         select: {
@@ -194,10 +194,10 @@ export const updateReview = async (
     where: { id: reviewId },
   });
 
-  if (!review) throw new NotFoundError('Review not found');
+  if (!review) throw new NotFoundError("Review not found");
 
   if (review.user_id !== userId) {
-    throw new ForbiddenError('You can only update your own reviews');
+    throw new ForbiddenError("You can only update your own reviews");
   }
 
   return await prisma.review.update({
@@ -219,15 +219,15 @@ export const deleteReview = async (userId: string, reviewId: string) => {
     where: { id: reviewId },
   });
 
-  if (!review) throw new NotFoundError('Review not found');
+  if (!review) throw new NotFoundError("Review not found");
 
   if (review.user_id !== userId) {
-    throw new ForbiddenError('You can only delete your own reviews');
+    throw new ForbiddenError("You can only delete your own reviews");
   }
 
   await prisma.review.delete({
     where: { id: reviewId },
   });
 
-  return { message: 'Review deleted successfully' };
+  return { message: "Review deleted successfully" };
 };

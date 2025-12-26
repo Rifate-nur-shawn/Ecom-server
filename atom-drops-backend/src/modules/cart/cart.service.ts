@@ -1,5 +1,5 @@
-import { prisma } from '../../config/prisma.client';
-import { NotFoundError, BadRequestError } from '../../shared/errors/app-error';
+import { prisma } from "../../config/prisma.client";
+import { NotFoundError, BadRequestError } from "../../shared/errors/app-error";
 
 // Get or create cart for user
 export const getOrCreateCart = async (userId: string) => {
@@ -62,9 +62,9 @@ export const addToCart = async (
     where: { id: productId },
   });
 
-  if (!product) throw new NotFoundError('Product not found');
+  if (!product) throw new NotFoundError("Product not found");
   if (product.stock < quantity)
-    throw new BadRequestError('Insufficient stock available');
+    throw new BadRequestError("Insufficient stock available");
 
   // Get or create cart
   let cart = await prisma.cart.findUnique({
@@ -93,7 +93,9 @@ export const addToCart = async (
     const newQuantity = existingItem.quantity + quantity;
     if (newQuantity > product.stock) {
       throw new BadRequestError(
-        `Cannot add ${quantity} more. Only ${product.stock - existingItem.quantity} available`
+        `Cannot add ${quantity} more. Only ${
+          product.stock - existingItem.quantity
+        } available`
       );
     }
 
@@ -132,13 +134,13 @@ export const updateCartItem = async (
   });
 
   if (!item || item.cart.user_id !== userId) {
-    throw new NotFoundError('Cart item not found');
+    throw new NotFoundError("Cart item not found");
   }
 
   if (quantity === 0) {
     // Remove item if quantity is 0
     await prisma.cartItem.delete({ where: { id: itemId } });
-    return { message: 'Item removed from cart' };
+    return { message: "Item removed from cart" };
   }
 
   if (quantity > item.product.stock) {
@@ -164,11 +166,11 @@ export const removeFromCart = async (userId: string, itemId: string) => {
   });
 
   if (!item || item.cart.user_id !== userId) {
-    throw new NotFoundError('Cart item not found');
+    throw new NotFoundError("Cart item not found");
   }
 
   await prisma.cartItem.delete({ where: { id: itemId } });
-  return { message: 'Item removed from cart' };
+  return { message: "Item removed from cart" };
 };
 
 // Clear entire cart
@@ -177,11 +179,11 @@ export const clearCart = async (userId: string) => {
     where: { user_id: userId },
   });
 
-  if (!cart) throw new NotFoundError('Cart not found');
+  if (!cart) throw new NotFoundError("Cart not found");
 
   await prisma.cartItem.deleteMany({
     where: { cart_id: cart.id },
   });
 
-  return { message: 'Cart cleared successfully' };
+  return { message: "Cart cleared successfully" };
 };

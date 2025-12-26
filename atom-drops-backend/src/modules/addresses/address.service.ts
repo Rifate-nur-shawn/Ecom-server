@@ -1,5 +1,5 @@
-import { prisma } from '../../config/prisma.client';
-import { NotFoundError } from '../../shared/errors/app-error';
+import { prisma } from "../../config/prisma.client";
+import { NotFoundError } from "../../shared/errors/app-error";
 
 export const createAddress = async (userId: string, data: any) => {
   // If this is set as default, unset all other defaults
@@ -23,7 +23,7 @@ export const createAddress = async (userId: string, data: any) => {
 export const getUserAddresses = async (userId: string) => {
   return await prisma.address.findMany({
     where: { user_id: userId },
-    orderBy: [{ is_default: 'desc' }, { created_at: 'desc' }],
+    orderBy: [{ is_default: "desc" }, { created_at: "desc" }],
   });
 };
 
@@ -32,7 +32,7 @@ export const getAddressById = async (userId: string, addressId: string) => {
     where: { id: addressId, user_id: userId },
   });
 
-  if (!address) throw new NotFoundError('Address not found');
+  if (!address) throw new NotFoundError("Address not found");
   return address;
 };
 
@@ -45,7 +45,7 @@ export const updateAddress = async (
     where: { id: addressId, user_id: userId },
   });
 
-  if (!address) throw new NotFoundError('Address not found');
+  if (!address) throw new NotFoundError("Address not found");
 
   if (data.is_default) {
     await prisma.address.updateMany({
@@ -65,11 +65,11 @@ export const deleteAddress = async (userId: string, addressId: string) => {
     where: { id: addressId, user_id: userId },
   });
 
-  if (!address) throw new NotFoundError('Address not found');
+  if (!address) throw new NotFoundError("Address not found");
 
   await prisma.address.delete({
     where: { id: addressId },
   });
 
-  return { message: 'Address deleted successfully' };
+  return { message: "Address deleted successfully" };
 };

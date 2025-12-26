@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import * as addressService from './address.service';
+import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import * as addressService from "./address.service";
 
 export const createAddress = async (req: Request, res: Response) => {
   try {
@@ -8,7 +8,7 @@ export const createAddress = async (req: Request, res: Response) => {
     const address = await addressService.createAddress(userId, req.body);
 
     res.status(StatusCodes.CREATED).json({
-      message: 'Address created successfully',
+      message: "Address created successfully",
       data: address,
     });
   } catch (error: any) {
@@ -48,7 +48,7 @@ export const updateAddress = async (req: Request, res: Response) => {
     );
 
     res.status(StatusCodes.OK).json({
-      message: 'Address updated successfully',
+      message: "Address updated successfully",
       data: address,
     });
   } catch (error: any) {

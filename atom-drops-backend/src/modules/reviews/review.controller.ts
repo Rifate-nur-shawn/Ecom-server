@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import * as reviewService from './review.service';
+import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import * as reviewService from "./review.service";
 
 export const createReview = async (req: Request, res: Response) => {
   try {
@@ -15,7 +15,7 @@ export const createReview = async (req: Request, res: Response) => {
     );
 
     res.status(StatusCodes.CREATED).json({
-      message: 'Review created successfully',
+      message: "Review created successfully",
       data: review,
     });
   } catch (error: any) {
@@ -76,7 +76,7 @@ export const updateReview = async (req: Request, res: Response) => {
     );
 
     res.status(StatusCodes.OK).json({
-      message: 'Review updated successfully',
+      message: "Review updated successfully",
       data: review,
     });
   } catch (error: any) {

@@ -1,10 +1,10 @@
-import { prisma } from '../../config/prisma.client';
+import { prisma } from "../../config/prisma.client";
 import {
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
-} from '../../shared/errors/app-error';
-import { sendOrderConfirmationEmail } from '../../shared/utils/email.util';
+} from "../../shared/errors/app-error";
+import { sendOrderConfirmationEmail } from "../../shared/utils/email.util";
 
 // Create order with inventory management
 export const createOrder = async (
@@ -17,7 +17,7 @@ export const createOrder = async (
     const address = await prisma.address.findFirst({
       where: { id: shippingAddressId, user_id: userId },
     });
-    if (!address) throw new NotFoundError('Invalid shipping address');
+    if (!address) throw new NotFoundError("Invalid shipping address");
   }
 
   // 2. Fetch all products and validate stock
@@ -27,13 +27,14 @@ export const createOrder = async (
   });
 
   if (products.length !== items.length) {
-    throw new NotFoundError('Some products not found');
+    throw new NotFoundError("Some products not found");
   }
 
   let totalAmount = 0;
   const orderItemsData = items.map((item) => {
     const product = products.find((p) => p.id === item.product_id);
-    if (!product) throw new NotFoundError(`Product ${item.product_id} not found`);
+    if (!product)
+      throw new NotFoundError(`Product ${item.product_id} not found`);
 
     // ✅ Stock validation
     if (product.stock < item.quantity) {
@@ -59,7 +60,7 @@ export const createOrder = async (
       data: {
         user_id: userId,
         total_amount: totalAmount,
-        status: 'PENDING',
+        status: "PENDING",
         shipping_address_id: shippingAddressId,
         items: {
           create: orderItemsData,
@@ -110,7 +111,7 @@ export const createOrderFromCart = async (
   });
 
   if (!cart || cart.items.length === 0) {
-    throw new BadRequestError('Cart is empty');
+    throw new BadRequestError("Cart is empty");
   }
 
   const orderItems = cart.items.map((item) => ({
@@ -152,7 +153,7 @@ export const getMyOrders = async (userId: string) => {
       shipping_address: true,
       payment: true,
     },
-    orderBy: { created_at: 'desc' },
+    orderBy: { created_at: "desc" },
   });
 };
 
@@ -186,8 +187,8 @@ export const getOrderById = async (userId: string, orderId: string) => {
     },
   });
 
-  if (!order) throw new NotFoundError('Order not found');
-  if (order.user_id !== userId) throw new UnauthorizedError('Unauthorized');
+  if (!order) throw new NotFoundError("Order not found");
+  if (order.user_id !== userId) throw new UnauthorizedError("Unauthorized");
 
   return order;
 };
@@ -199,23 +200,23 @@ export const cancelOrder = async (userId: string, orderId: string) => {
     include: { items: true, payment: true },
   });
 
-  if (!order) throw new NotFoundError('Order not found');
-  if (order.user_id !== userId) throw new UnauthorizedError('Unauthorized');
+  if (!order) throw new NotFoundError("Order not found");
+  if (order.user_id !== userId) throw new UnauthorizedError("Unauthorized");
 
   // Check if order can be cancelled
   if (
-    order.status === 'PAID' ||
-    order.status === 'PROCESSING' ||
-    order.status === 'SHIPPED' ||
-    order.status === 'DELIVERED'
+    order.status === "PAID" ||
+    order.status === "PROCESSING" ||
+    order.status === "SHIPPED" ||
+    order.status === "DELIVERED"
   ) {
     throw new BadRequestError(
-      'Cannot cancel orders that are paid, processing, shipped, or delivered'
+      "Cannot cancel orders that are paid, processing, shipped, or delivered"
     );
   }
 
-  if (order.status === 'CANCELLED') {
-    throw new BadRequestError('Order is already cancelled');
+  if (order.status === "CANCELLED") {
+    throw new BadRequestError("Order is already cancelled");
   }
 
   // Cancel order and restore stock
@@ -223,7 +224,7 @@ export const cancelOrder = async (userId: string, orderId: string) => {
     // Update order status
     await tx.order.update({
       where: { id: orderId },
-      data: { status: 'CANCELLED' },
+      data: { status: "CANCELLED" },
     });
 
     // Restore stock
@@ -242,12 +243,12 @@ export const cancelOrder = async (userId: string, orderId: string) => {
     if (order.payment) {
       await tx.payment.update({
         where: { id: order.payment.id },
-        data: { status: 'FAILED' },
+        data: { status: "FAILED" },
       });
     }
   });
 
-  return { message: 'Order cancelled successfully' };
+  return { message: "Order cancelled successfully" };
 };
 
 // Update order status (Admin use)
@@ -260,12 +261,12 @@ export const updateOrderStatus = async (
     where: { id: orderId },
   });
 
-  if (!order) throw new NotFoundError('Order not found');
+  if (!order) throw new NotFoundError("Order not found");
 
   const updateData: any = { status };
   if (trackingNumber) updateData.tracking_number = trackingNumber;
 
-  if (status === 'SHIPPED' && !order.estimated_delivery) {
+  if (status === "SHIPPED" && !order.estimated_delivery) {
     // Set estimated delivery to 7 days from now
     const estimatedDelivery = new Date();
     estimatedDelivery.setDate(estimatedDelivery.getDate() + 7);

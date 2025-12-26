@@ -10,7 +10,7 @@ interface EmailOptions {
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   // TODO: Configure nodemailer transport in production
   // For now, just log the email
-  console.log('📧 Email would be sent:', {
+  console.log("📧 Email would be sent:", {
     to: options.to,
     subject: options.subject,
   });
@@ -47,7 +47,7 @@ export const sendOrderConfirmationEmail = async (
 
   await sendEmail({
     to: email,
-    subject: 'Order Confirmation - Atom Drops',
+    subject: "Order Confirmation - Atom Drops",
     html,
   });
 };
@@ -69,7 +69,7 @@ export const sendPasswordResetEmail = async (
 
   await sendEmail({
     to: email,
-    subject: 'Password Reset - Atom Drops',
+    subject: "Password Reset - Atom Drops",
     html,
   });
 };
@@ -88,7 +88,7 @@ export const sendPaymentSuccessEmail = async (
 
   await sendEmail({
     to: email,
-    subject: 'Payment Successful - Atom Drops',
+    subject: "Payment Successful - Atom Drops",
     html,
   });
 };

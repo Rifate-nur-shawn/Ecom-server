@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { StatusCodes } from 'http-status-codes';
-import { env } from '../../config/env';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { StatusCodes } from "http-status-codes";
+import { env } from "../../config/env";
 
 // Extend Express Request type to include user
 declare global {
@@ -21,11 +21,11 @@ export const authenticate = (
   next: NextFunction
 ) => {
   // 1. Get token from Cookies OR Header
-  const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res.status(StatusCodes.UNAUTHORIZED).json({
-      error: 'Authentication required. Please log in.',
+      error: "Authentication required. Please log in.",
     });
   }
 

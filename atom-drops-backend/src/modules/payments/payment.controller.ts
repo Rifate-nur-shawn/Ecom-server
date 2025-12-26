@@ -21,8 +21,10 @@ export const bkashCallback = async (req: Request, res: Response) => {
   try {
     const { paymentID, status } = req.query;
 
-    if (status === 'cancel' || status === 'failure') {
-      return res.redirect(`${env.FRONTEND_URL}/payment/failed?message=${status}`);
+    if (status === "cancel" || status === "failure") {
+      return res.redirect(
+        `${env.FRONTEND_URL}/payment/failed?message=${status}`
+      );
     }
 
     await paymentService.executePayment(String(paymentID));

@@ -1,4 +1,4 @@
-import { StatusCodes } from 'http-status-codes';
+import { StatusCodes } from "http-status-codes";
 
 export class AppError extends Error {
   constructor(
@@ -12,31 +12,31 @@ export class AppError extends Error {
 }
 
 export class NotFoundError extends AppError {
-  constructor(message: string = 'Resource not found') {
+  constructor(message: string = "Resource not found") {
     super(message, StatusCodes.NOT_FOUND);
   }
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message: string = 'Unauthorized') {
+  constructor(message: string = "Unauthorized") {
     super(message, StatusCodes.UNAUTHORIZED);
   }
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message: string = 'Forbidden') {
+  constructor(message: string = "Forbidden") {
     super(message, StatusCodes.FORBIDDEN);
   }
 }
 
 export class BadRequestError extends AppError {
-  constructor(message: string = 'Bad request') {
+  constructor(message: string = "Bad request") {
     super(message, StatusCodes.BAD_REQUEST);
   }
 }
 
 export class ConflictError extends AppError {
-  constructor(message: string = 'Conflict') {
+  constructor(message: string = "Conflict") {
     super(message, StatusCodes.CONFLICT);
   }
 }

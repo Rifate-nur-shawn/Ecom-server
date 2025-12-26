@@ -1,5 +1,5 @@
-import { prisma } from '../../config/prisma.client';
-import { NotFoundError } from '../../shared/errors/app-error';
+import { prisma } from "../../config/prisma.client";
+import { NotFoundError } from "../../shared/errors/app-error";
 
 // Dashboard statistics
 export const getDashboardStats = async () => {
@@ -16,12 +16,12 @@ export const getDashboardStats = async () => {
     prisma.product.count(),
     prisma.order.count(),
     prisma.order.aggregate({
-      where: { status: { in: ['PAID', 'DELIVERED'] } },
+      where: { status: { in: ["PAID", "DELIVERED"] } },
       _sum: { total_amount: true },
     }),
     prisma.order.findMany({
       take: 10,
-      orderBy: { created_at: 'desc' },
+      orderBy: { created_at: "desc" },
       include: {
         user: {
           select: { id: true, email: true, name: true },
@@ -33,7 +33,7 @@ export const getDashboardStats = async () => {
     }),
     prisma.product.findMany({
       where: { stock: { lte: 10 } },
-      orderBy: { stock: 'asc' },
+      orderBy: { stock: "asc" },
       take: 10,
       select: {
         id: true,
@@ -43,18 +43,15 @@ export const getDashboardStats = async () => {
       },
     }),
     prisma.order.groupBy({
-      by: ['status'],
+      by: ["status"],
       _count: true,
     }),
   ]);
 
-  const statusCounts = ordersByStatus.reduce(
-    (acc, curr) => {
-      acc[curr.status] = curr._count;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  const statusCounts = ordersByStatus.reduce((acc, curr) => {
+    acc[curr.status] = curr._count;
+    return acc;
+  }, {} as Record<string, number>);
 
   return {
     totalUsers,
@@ -80,8 +77,8 @@ export const getAllOrders = async (
   if (status) where.status = status;
   if (search) {
     where.OR = [
-      { id: { contains: search, mode: 'insensitive' } },
-      { user: { email: { contains: search, mode: 'insensitive' } } },
+      { id: { contains: search, mode: "insensitive" } },
+      { user: { email: { contains: search, mode: "insensitive" } } },
     ];
   }
 
@@ -90,7 +87,7 @@ export const getAllOrders = async (
       where,
       skip,
       take: limit,
-      orderBy: { created_at: 'desc' },
+      orderBy: { created_at: "desc" },
       include: {
         user: {
           select: { id: true, email: true, name: true, phone: true },
@@ -130,11 +127,11 @@ export const updateOrderStatus = async (
     where: { id: orderId },
   });
 
-  if (!order) throw new NotFoundError('Order not found');
+  if (!order) throw new NotFoundError("Order not found");
 
   const updateData: any = { status };
   if (trackingNumber) updateData.tracking_number = trackingNumber;
-  if (status === 'SHIPPED' && !order.estimated_delivery) {
+  if (status === "SHIPPED" && !order.estimated_delivery) {
     // Set estimated delivery to 7 days from now
     const estimatedDelivery = new Date();
     estimatedDelivery.setDate(estimatedDelivery.getDate() + 7);
@@ -170,8 +167,8 @@ export const getAllUsers = async (
   if (role) where.role = role;
   if (search) {
     where.OR = [
-      { email: { contains: search, mode: 'insensitive' } },
-      { name: { contains: search, mode: 'insensitive' } },
+      { email: { contains: search, mode: "insensitive" } },
+      { name: { contains: search, mode: "insensitive" } },
     ];
   }
 
@@ -180,7 +177,7 @@ export const getAllUsers = async (
       where,
       skip,
       take: limit,
-      orderBy: { created_at: 'desc' },
+      orderBy: { created_at: "desc" },
       select: {
         id: true,
         email: true,
@@ -216,7 +213,7 @@ export const updateUserRole = async (userId: string, role: string) => {
     where: { id: userId },
   });
 
-  if (!user) throw new NotFoundError('User not found');
+  if (!user) throw new NotFoundError("User not found");
 
   return await prisma.user.update({
     where: { id: userId },
@@ -235,21 +232,21 @@ export const getProductAnalytics = async () => {
   const [topSellingProducts, lowStockProducts, totalRevenue] =
     await Promise.all([
       prisma.orderItem.groupBy({
-        by: ['product_id'],
+        by: ["product_id"],
         _sum: {
           quantity: true,
         },
         _count: true,
         orderBy: {
           _sum: {
-            quantity: 'desc',
+            quantity: "desc",
           },
         },
         take: 10,
       }),
       prisma.product.findMany({
         where: { stock: { lte: 10 } },
-        orderBy: { stock: 'asc' },
+        orderBy: { stock: "asc" },
         select: {
           id: true,
           name: true,

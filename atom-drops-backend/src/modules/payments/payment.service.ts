@@ -1,10 +1,10 @@
-import { prisma } from '../../config/prisma.client';
+import { prisma } from "../../config/prisma.client";
 import {
   NotFoundError,
   UnauthorizedError,
   BadRequestError,
-} from '../../shared/errors/app-error';
-import { sendPaymentSuccessEmail } from '../../shared/utils/email.util';
+} from "../../shared/errors/app-error";
+import { sendPaymentSuccessEmail } from "../../shared/utils/email.util";
 // import axios from 'axios';
 // import { env } from '../../config/env';
 
@@ -18,10 +18,9 @@ export const initiatePayment = async (userId: string, orderId: string) => {
     include: { user: true },
   });
 
-  if (!order) throw new NotFoundError('Order not found');
-  if (order.user_id !== userId) throw new UnauthorizedError('Unauthorized');
-  if (order.status === 'PAID')
-    throw new BadRequestError('Order already paid');
+  if (!order) throw new NotFoundError("Order not found");
+  if (order.user_id !== userId) throw new UnauthorizedError("Unauthorized");
+  if (order.status === "PAID") throw new BadRequestError("Order already paid");
 
   // 2. Prepare bKash Payload
   // NOTE: In a real app, you would call bKash's Grant Token API first.
@@ -64,8 +63,8 @@ export const executePayment = async (paymentID: string) => {
     include: { order: { include: { user: true } } },
   });
 
-  if (!payment) throw new NotFoundError('Invalid Payment ID');
-  if (payment.status === 'SUCCESS') return payment; // Idempotency (Prevent double processing)
+  if (!payment) throw new NotFoundError("Invalid Payment ID");
+  if (payment.status === "SUCCESS") return payment; // Idempotency (Prevent double processing)
 
   // 2. Verify with bKash (Mocking the verification)
   // In production: await axios.post('/execute', { paymentID })
@@ -75,12 +74,12 @@ export const executePayment = async (paymentID: string) => {
     // Update Payment Status
     prisma.payment.update({
       where: { id: payment.id },
-      data: { status: 'SUCCESS' },
+      data: { status: "SUCCESS" },
     }),
     // Update Order Status
     prisma.order.update({
       where: { id: payment.order_id },
-      data: { status: 'PAID' },
+      data: { status: "PAID" },
     }),
   ]);
 

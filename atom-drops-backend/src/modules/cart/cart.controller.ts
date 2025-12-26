@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import * as cartService from './cart.service';
+import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import * as cartService from "./cart.service";
 
 export const getCart = async (req: Request, res: Response) => {
   try {
@@ -21,7 +21,7 @@ export const addToCart = async (req: Request, res: Response) => {
     const item = await cartService.addToCart(userId, product_id, quantity);
 
     res.status(StatusCodes.CREATED).json({
-      message: 'Item added to cart',
+      message: "Item added to cart",
       data: item,
     });
   } catch (error: any) {
@@ -38,7 +38,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
     const result = await cartService.updateCartItem(userId, itemId, quantity);
 
     res.status(StatusCodes.OK).json({
-      message: 'Cart updated',
+      message: "Cart updated",
       data: result,
     });
   } catch (error: any) {

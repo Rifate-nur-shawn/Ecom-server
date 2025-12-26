@@ -1,18 +1,18 @@
-import { prisma } from '../../config/prisma.client';
-import { generateUniqueSlug } from '../../shared/utils/slug.util';
-import { NotFoundError, BadRequestError } from '../../shared/errors/app-error';
+import { prisma } from "../../config/prisma.client";
+import { generateUniqueSlug } from "../../shared/utils/slug.util";
+import { NotFoundError, BadRequestError } from "../../shared/errors/app-error";
 
 // Create product with slug and images
 export const createProduct = async (data: any) => {
   // Generate unique slug
-  const slug = await generateUniqueSlug(data.name, 'product');
+  const slug = await generateUniqueSlug(data.name, "product");
 
   // Validate category if provided
   if (data.category_id) {
     const category = await prisma.category.findUnique({
       where: { id: data.category_id },
     });
-    if (!category) throw new NotFoundError('Category not found');
+    if (!category) throw new NotFoundError("Category not found");
   }
 
   const product = await prisma.product.create({
@@ -36,7 +36,7 @@ export const getAllProducts = async (filters?: {
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
-  sortBy?: 'price_asc' | 'price_desc' | 'newest' | 'name';
+  sortBy?: "price_asc" | "price_desc" | "newest" | "name";
   page?: number;
   limit?: number;
 }) => {
@@ -49,8 +49,8 @@ export const getAllProducts = async (filters?: {
   // Search functionality
   if (filters?.search) {
     where.OR = [
-      { name: { contains: filters.search, mode: 'insensitive' } },
-      { description: { contains: filters.search, mode: 'insensitive' } },
+      { name: { contains: filters.search, mode: "insensitive" } },
+      { description: { contains: filters.search, mode: "insensitive" } },
     ];
   }
 
@@ -72,10 +72,10 @@ export const getAllProducts = async (filters?: {
   }
 
   // Sorting
-  let orderBy: any = { created_at: 'desc' };
-  if (filters?.sortBy === 'price_asc') orderBy = { price: 'asc' };
-  if (filters?.sortBy === 'price_desc') orderBy = { price: 'desc' };
-  if (filters?.sortBy === 'name') orderBy = { name: 'asc' };
+  let orderBy: any = { created_at: "desc" };
+  if (filters?.sortBy === "price_asc") orderBy = { price: "asc" };
+  if (filters?.sortBy === "price_desc") orderBy = { price: "desc" };
+  if (filters?.sortBy === "name") orderBy = { name: "asc" };
 
   const [products, total] = await Promise.all([
     prisma.product.findMany({
@@ -86,7 +86,7 @@ export const getAllProducts = async (filters?: {
       include: {
         category: true,
         images: {
-          orderBy: { order: 'asc' },
+          orderBy: { order: "asc" },
         },
         _count: {
           select: { reviews: true },
@@ -132,7 +132,7 @@ export const getProductById = async (id: string) => {
     include: {
       category: true,
       images: {
-        orderBy: { order: 'asc' },
+        orderBy: { order: "asc" },
       },
       _count: {
         select: { reviews: true },
@@ -140,7 +140,7 @@ export const getProductById = async (id: string) => {
     },
   });
 
-  if (!product) throw new NotFoundError('Product not found');
+  if (!product) throw new NotFoundError("Product not found");
 
   // Get average rating
   const ratingStats = await prisma.review.aggregate({
@@ -164,7 +164,7 @@ export const getProductBySlug = async (slug: string) => {
     include: {
       category: true,
       images: {
-        orderBy: { order: 'asc' },
+        orderBy: { order: "asc" },
       },
       _count: {
         select: { reviews: true },
@@ -172,7 +172,7 @@ export const getProductBySlug = async (slug: string) => {
     },
   });
 
-  if (!product) throw new NotFoundError('Product not found');
+  if (!product) throw new NotFoundError("Product not found");
 
   // Get average rating
   const ratingStats = await prisma.review.aggregate({
@@ -192,11 +192,11 @@ export const getProductBySlug = async (slug: string) => {
 // Update product
 export const updateProduct = async (id: string, data: any) => {
   const product = await prisma.product.findUnique({ where: { id } });
-  if (!product) throw new NotFoundError('Product not found');
+  if (!product) throw new NotFoundError("Product not found");
 
   // Generate new slug if name is updated
   if (data.name && data.name !== product.name) {
-    data.slug = await generateUniqueSlug(data.name, 'product');
+    data.slug = await generateUniqueSlug(data.name, "product");
   }
 
   // Validate category if provided
@@ -204,7 +204,7 @@ export const updateProduct = async (id: string, data: any) => {
     const category = await prisma.category.findUnique({
       where: { id: data.category_id },
     });
-    if (!category) throw new NotFoundError('Category not found');
+    if (!category) throw new NotFoundError("Category not found");
   }
 
   return await prisma.product.update({
@@ -231,11 +231,11 @@ export const deleteProduct = async (id: string) => {
     },
   });
 
-  if (!product) throw new NotFoundError('Product not found');
+  if (!product) throw new NotFoundError("Product not found");
 
   if (product._count.orderItems > 0) {
     throw new BadRequestError(
-      'Cannot delete product that has been ordered. Consider marking it as out of stock instead.'
+      "Cannot delete product that has been ordered. Consider marking it as out of stock instead."
     );
   }
 
@@ -248,7 +248,7 @@ export const deleteProduct = async (id: string) => {
 
   await prisma.product.delete({ where: { id } });
 
-  return { message: 'Product deleted successfully' };
+  return { message: "Product deleted successfully" };
 };
 
 // Product image management
@@ -262,7 +262,7 @@ export const addProductImage = async (
   }
 ) => {
   const product = await prisma.product.findUnique({ where: { id: productId } });
-  if (!product) throw new NotFoundError('Product not found');
+  if (!product) throw new NotFoundError("Product not found");
 
   // If this is set as primary, unset other primary images
   if (imageData.is_primary) {
@@ -281,17 +281,21 @@ export const addProductImage = async (
 };
 
 export const deleteProductImage = async (imageId: string) => {
-  const image = await prisma.productImage.findUnique({ where: { id: imageId } });
-  if (!image) throw new NotFoundError('Image not found');
+  const image = await prisma.productImage.findUnique({
+    where: { id: imageId },
+  });
+  if (!image) throw new NotFoundError("Image not found");
 
   await prisma.productImage.delete({ where: { id: imageId } });
 
-  return { message: 'Image deleted successfully' };
+  return { message: "Image deleted successfully" };
 };
 
 export const setPrimaryImage = async (imageId: string) => {
-  const image = await prisma.productImage.findUnique({ where: { id: imageId } });
-  if (!image) throw new NotFoundError('Image not found');
+  const image = await prisma.productImage.findUnique({
+    where: { id: imageId },
+  });
+  if (!image) throw new NotFoundError("Image not found");
 
   // Unset all primary images for this product
   await prisma.productImage.updateMany({

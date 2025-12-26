@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const createReviewSchema = z.object({
   body: z.object({
@@ -23,8 +23,8 @@ export const getProductReviewsSchema = z.object({
     productId: z.string().uuid(),
   }),
   query: z.object({
-    page: z.string().optional().default('1'),
-    limit: z.string().optional().default('10'),
+    page: z.string().optional().default("1"),
+    limit: z.string().optional().default("10"),
     rating: z.string().optional(),
   }),
 });

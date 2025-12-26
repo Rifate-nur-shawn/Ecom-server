@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import * as adminService from './admin.service';
+import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import * as adminService from "./admin.service";
 
 export const getDashboardStats = async (_req: Request, res: Response) => {
   try {
@@ -37,7 +37,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     );
 
     res.status(StatusCodes.OK).json({
-      message: 'Order status updated successfully',
+      message: "Order status updated successfully",
       data: order,
     });
   } catch (error: any) {
@@ -67,7 +67,7 @@ export const updateUserRole = async (req: Request, res: Response) => {
     const user = await adminService.updateUserRole(id, role);
 
     res.status(StatusCodes.OK).json({
-      message: 'User role updated successfully',
+      message: "User role updated successfully",
       data: user,
     });
   } catch (error: any) {

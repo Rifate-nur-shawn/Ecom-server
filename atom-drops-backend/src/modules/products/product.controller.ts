@@ -1,12 +1,12 @@
-import { Request, Response } from 'express';
-import * as productService from './product.service';
-import { StatusCodes } from 'http-status-codes';
+import { Request, Response } from "express";
+import * as productService from "./product.service";
+import { StatusCodes } from "http-status-codes";
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const product = await productService.createProduct(req.body);
     res.status(StatusCodes.CREATED).json({
-      message: 'Product created successfully',
+      message: "Product created successfully",
       data: product,
     });
   } catch (error: any) {
@@ -27,7 +27,7 @@ export const getProducts = async (req: Request, res: Response) => {
       maxPrice: req.query.maxPrice
         ? parseInt(req.query.maxPrice as string)
         : undefined,
-      inStock: req.query.inStock === 'true',
+      inStock: req.query.inStock === "true",
       sortBy: req.query.sortBy as any,
       page: req.query.page ? parseInt(req.query.page as string) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
@@ -66,12 +66,9 @@ export const getProductBySlug = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const product = await productService.updateProduct(
-      req.params.id,
-      req.body
-    );
+    const product = await productService.updateProduct(req.params.id, req.body);
     res.status(StatusCodes.OK).json({
-      message: 'Product updated successfully',
+      message: "Product updated successfully",
       data: product,
     });
   } catch (error: any) {
@@ -95,12 +92,9 @@ export const deleteProduct = async (req: Request, res: Response) => {
 // Image management
 export const addProductImage = async (req: Request, res: Response) => {
   try {
-    const image = await productService.addProductImage(
-      req.params.id,
-      req.body
-    );
+    const image = await productService.addProductImage(req.params.id, req.body);
     res.status(StatusCodes.CREATED).json({
-      message: 'Image added successfully',
+      message: "Image added successfully",
       data: image,
     });
   } catch (error: any) {
@@ -125,7 +119,7 @@ export const setPrimaryImage = async (req: Request, res: Response) => {
   try {
     const image = await productService.setPrimaryImage(req.params.imageId);
     res.status(StatusCodes.OK).json({
-      message: 'Primary image updated',
+      message: "Primary image updated",
       data: image,
     });
   } catch (error: any) {

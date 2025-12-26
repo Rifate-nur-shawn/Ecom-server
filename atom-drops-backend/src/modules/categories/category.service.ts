@@ -1,17 +1,17 @@
-import { prisma } from '../../config/prisma.client';
-import { generateUniqueSlug } from '../../shared/utils/slug.util';
-import { NotFoundError, BadRequestError } from '../../shared/errors/app-error';
+import { prisma } from "../../config/prisma.client";
+import { generateUniqueSlug } from "../../shared/utils/slug.util";
+import { NotFoundError, BadRequestError } from "../../shared/errors/app-error";
 
 export const createCategory = async (data: any) => {
   // Generate unique slug
-  const slug = await generateUniqueSlug(data.name, 'category');
+  const slug = await generateUniqueSlug(data.name, "category");
 
   // Check if parent exists
   if (data.parent_id) {
     const parent = await prisma.category.findUnique({
       where: { id: data.parent_id },
     });
-    if (!parent) throw new NotFoundError('Parent category not found');
+    if (!parent) throw new NotFoundError("Parent category not found");
   }
 
   const category = await prisma.category.create({
@@ -60,7 +60,7 @@ export const getAllCategories = async (includeProducts = false) => {
         },
       }),
     },
-    orderBy: { name: 'asc' },
+    orderBy: { name: "asc" },
   });
 };
 
@@ -76,7 +76,7 @@ export const getCategoryById = async (categoryId: string) => {
     },
   });
 
-  if (!category) throw new NotFoundError('Category not found');
+  if (!category) throw new NotFoundError("Category not found");
   return category;
 };
 
@@ -92,7 +92,7 @@ export const getCategoryBySlug = async (slug: string) => {
     },
   });
 
-  if (!category) throw new NotFoundError('Category not found');
+  if (!category) throw new NotFoundError("Category not found");
   return category;
 };
 
@@ -101,16 +101,16 @@ export const updateCategory = async (categoryId: string, data: any) => {
     where: { id: categoryId },
   });
 
-  if (!category) throw new NotFoundError('Category not found');
+  if (!category) throw new NotFoundError("Category not found");
 
   // Prevent circular parent relationship
   if (data.parent_id === categoryId) {
-    throw new BadRequestError('Category cannot be its own parent');
+    throw new BadRequestError("Category cannot be its own parent");
   }
 
   // Generate new slug if name is updated
   if (data.name && data.name !== category.name) {
-    data.slug = await generateUniqueSlug(data.name, 'category');
+    data.slug = await generateUniqueSlug(data.name, "category");
   }
 
   // Check if parent exists
@@ -118,7 +118,7 @@ export const updateCategory = async (categoryId: string, data: any) => {
     const parent = await prisma.category.findUnique({
       where: { id: data.parent_id },
     });
-    if (!parent) throw new NotFoundError('Parent category not found');
+    if (!parent) throw new NotFoundError("Parent category not found");
   }
 
   return await prisma.category.update({
@@ -142,11 +142,11 @@ export const deleteCategory = async (categoryId: string) => {
     },
   });
 
-  if (!category) throw new NotFoundError('Category not found');
+  if (!category) throw new NotFoundError("Category not found");
 
   if (category.children.length > 0) {
     throw new BadRequestError(
-      'Cannot delete category with subcategories. Delete or move subcategories first.'
+      "Cannot delete category with subcategories. Delete or move subcategories first."
     );
   }
 
@@ -160,21 +160,21 @@ export const deleteCategory = async (categoryId: string) => {
     where: { id: categoryId },
   });
 
-  return { message: 'Category deleted successfully' };
+  return { message: "Category deleted successfully" };
 };
 
 export const getCategoryProducts = async (
   categoryId: string,
   page = 1,
   limit = 20,
-  sortBy = 'newest'
+  sortBy = "newest"
 ) => {
   const skip = (page - 1) * limit;
 
-  let orderBy: any = { created_at: 'desc' };
-  if (sortBy === 'price_asc') orderBy = { price: 'asc' };
-  if (sortBy === 'price_desc') orderBy = { price: 'desc' };
-  if (sortBy === 'name') orderBy = { name: 'asc' };
+  let orderBy: any = { created_at: "desc" };
+  if (sortBy === "price_asc") orderBy = { price: "asc" };
+  if (sortBy === "price_desc") orderBy = { price: "desc" };
+  if (sortBy === "name") orderBy = { name: "asc" };
 
   const [products, total] = await Promise.all([
     prisma.product.findMany({

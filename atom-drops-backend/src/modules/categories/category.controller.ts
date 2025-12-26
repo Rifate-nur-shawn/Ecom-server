@@ -1,13 +1,13 @@
-import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import * as categoryService from './category.service';
+import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import * as categoryService from "./category.service";
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
     const category = await categoryService.createCategory(req.body);
 
     res.status(StatusCodes.CREATED).json({
-      message: 'Category created successfully',
+      message: "Category created successfully",
       data: category,
     });
   } catch (error: any) {
@@ -17,7 +17,7 @@ export const createCategory = async (req: Request, res: Response) => {
 
 export const getAllCategories = async (req: Request, res: Response) => {
   try {
-    const includeProducts = req.query.includeProducts === 'true';
+    const includeProducts = req.query.includeProducts === "true";
     const categories = await categoryService.getAllCategories(includeProducts);
 
     res.status(StatusCodes.OK).json({ data: categories });
@@ -54,7 +54,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     );
 
     res.status(StatusCodes.OK).json({
-      message: 'Category updated successfully',
+      message: "Category updated successfully",
       data: category,
     });
   } catch (error: any) {
@@ -77,7 +77,7 @@ export const getCategoryProducts = async (req: Request, res: Response) => {
     const { id } = req.params;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
-    const sortBy = (req.query.sortBy as string) || 'newest';
+    const sortBy = (req.query.sortBy as string) || "newest";
 
     const result = await categoryService.getCategoryProducts(
       id,

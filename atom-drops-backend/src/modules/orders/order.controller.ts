@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import * as orderService from './order.service';
-import { StatusCodes } from 'http-status-codes';
+import { Request, Response } from "express";
+import * as orderService from "./order.service";
+import { StatusCodes } from "http-status-codes";
 
 export const createOrder = async (req: Request, res: Response) => {
   try {
@@ -14,7 +14,7 @@ export const createOrder = async (req: Request, res: Response) => {
     );
 
     res.status(StatusCodes.CREATED).json({
-      message: 'Order placed successfully',
+      message: "Order placed successfully",
       data: order,
     });
   } catch (error: any) {
@@ -35,7 +35,7 @@ export const createOrderFromCart = async (req: Request, res: Response) => {
     );
 
     res.status(StatusCodes.CREATED).json({
-      message: 'Order placed successfully from cart',
+      message: "Order placed successfully from cart",
       data: order,
     });
   } catch (error: any) {
