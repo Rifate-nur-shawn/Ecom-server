@@ -5,7 +5,7 @@ import { env } from "../../config/env";
 
 export const initPayment = async (req: Request, res: Response) => {
   try {
-    const userId = req.user!.id;
+    const userId = req.user!.userId;
     const { order_id } = req.body;
 
     const data = await paymentService.initiatePayment(userId, order_id);

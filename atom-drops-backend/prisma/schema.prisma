@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -33,26 +31,121 @@ model User {
   id            String    @id @default(uuid())
   email         String    @unique
   password_hash String
+  name          String?
+  phone         String?
   role          Role      @default(USER)
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
-  
+
   orders        Order[]
+  addresses     Address[]
+  reviews       Review[]
+  cart          Cart?
+  password_reset_tokens PasswordResetToken[]
+}
+
+model Address {
+  id            String   @id @default(uuid())
+  user_id       String
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  full_name     String
+  phone         String
+  address_line1 String
+  address_line2 String?
+  city          String
+  state         String
+  postal_code   String
+  country       String   @default("Bangladesh")
+  is_default    Boolean  @default(false)
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  orders        Order[]
+
+  @@index([user_id])
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  parent_id   String?
+  parent      Category? @relation("CategoryHierarchy", fields: [parent_id], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  products    Product[]
+
+  @@index([slug])
 }
 
 model Product {
   id              String   @id @default(uuid())
   name            String
+  slug            String?  @unique  // Make it optional temporarily
   description     String
-  price           Int      // Store in cents (1000 = 10.00 BDT)
+  price           Int
   currency        String   @default("BDT")
   stock           Int      @default(0)
   is_preorder     Boolean  @default(true)
   image_url       String?
+
+  category_id     String?
+  category        Category? @relation(fields: [category_id], references: [id])
+
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
   orderItems      OrderItem[]
+  cartItems       CartItem[]
+  images          ProductImage[]
+  reviews         Review[]
+
+  @@index([slug])
+  @@index([category_id])
+}
+
+model ProductImage {
+  id         String  @id @default(uuid())
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  url        String
+  alt_text   String?
+  is_primary Boolean @default(false)
+  order      Int     @default(0)
+
+  created_at DateTime @default(now())
+
+  @@index([product_id])
+}
+
+model Cart {
+  id         String     @id @default(uuid())
+  user_id    String     @unique
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+
+  items      CartItem[]
+}
+
+model CartItem {
+  id         String   @id @default(uuid())
+  cart_id    String
+  cart       Cart     @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  product_id String
+  product    Product  @relation(fields: [product_id], references: [id])
+  quantity   Int      @default(1)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([cart_id, product_id])
+  @@index([cart_id])
 }
 
 model Order {
@@ -60,36 +153,76 @@ model Order {
   user_id         String
   user            User        @relation(fields: [user_id], references: [id])
   status          OrderStatus @default(PENDING)
-  total_amount    Int         
-  
-  payment_id      String?     
+  total_amount    Int
+
+  shipping_address_id String?
+  shipping_address    Address?  @relation(fields: [shipping_address_id], references: [id])
+  shipping_cost       Int       @default(0)
+  tracking_number     String?
+  estimated_delivery  DateTime?
+
   created_at      DateTime    @default(now())
   updated_at      DateTime    @updatedAt
 
   items           OrderItem[]
-  payment         Payment?
+  payment         Payment?    // Remove fields and references from here
+
+  @@index([user_id])
+  @@index([status])
 }
 
 model OrderItem {
   id          String   @id @default(uuid())
   order_id    String
-  order       Order    @relation(fields: [order_id], references: [id])
+  order       Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
   product_id  String
   product     Product  @relation(fields: [product_id], references: [id])
-  
+
   quantity    Int
-  price       Int      
+  price       Int
+
+  @@index([order_id])
 }
 
 model Payment {
   id              String        @id @default(uuid())
   order_id        String        @unique
   order           Order         @relation(fields: [order_id], references: [id])
-  
+
   amount          Int
   provider        String        @default("bkash")
-  transaction_id  String?       
+  transaction_id  String?
   status          PaymentStatus @default(PENDING)
-  
+
   created_at      DateTime      @default(now())
+
+  @@index([transaction_id])
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  product_id String
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  rating     Int      // 1-5
+  comment    String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([product_id, user_id])
+  @@index([product_id])
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  @@index([token])
+  @@index([user_id])
 }

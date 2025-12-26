@@ -1,17 +1,24 @@
-import express, { Application, Request, Response } from "express";
-import cors from "cors";
-import helmet from "helmet";
-import cookieParser from "cookie-parser";
-import { env } from "./config/env";
-import { errorHandler } from "./shared/middlewares/error.middleware";
+import express, { Application, Request, Response } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import { env } from './config/env';
+import { errorHandler } from './shared/middlewares/error.middleware';
 import {
   apiLimiter,
   authLimiter,
-} from "./shared/middlewares/rate-limit.middleware";
-import authRoutes from "./modules/auth/auth.routes";
-import productRoutes from "./modules/products/product.routes";
-import orderRoutes from "./modules/orders/order.routes";
-import paymentRoutes from "./modules/payments/payment.routes";
+} from './shared/middlewares/rate-limit.middleware';
+
+// Import all route modules
+import authRoutes from './modules/auth/auth.routes';
+import productRoutes from './modules/products/product.routes';
+import orderRoutes from './modules/orders/order.routes';
+import paymentRoutes from './modules/payments/payment.routes';
+import addressRoutes from './modules/addresses/address.routes';
+import cartRoutes from './modules/cart/cart.routes';
+import categoryRoutes from './modules/categories/category.routes';
+import reviewRoutes from './modules/reviews/review.routes';
+import adminRoutes from './modules/admin/admin.routes';
 
 const app: Application = express();
 
@@ -19,14 +26,14 @@ const app: Application = express();
 app.use(helmet()); // Security headers
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   })
 );
 
 // 2. Rate limiting (only in production to avoid slowing down development)
-if (env.NODE_ENV === "production") {
-  app.use("/api", apiLimiter);
+if (env.NODE_ENV === 'production') {
+  app.use('/api', apiLimiter);
 }
 
 // 3. Body Parsers
@@ -35,24 +42,29 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(cookieParser()); // Parse cookies
 
 // 4. Health Check Route
-app.get("/health", (_req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
-    status: "ok",
-    message: "Atom Drops Backend is running correctly",
+    status: 'ok',
+    message: 'Atom Drops Backend is running correctly',
     timestamp: new Date().toISOString(),
     environment: env.NODE_ENV,
   });
 });
 
 // 5. API Routes
-app.use("/api/v1/auth", authLimiter, authRoutes); // Auth routes with stricter rate limiting
-app.use("/api/v1/products", productRoutes);
-app.use("/api/v1/orders", orderRoutes);
-app.use("/api/v1/payments", paymentRoutes);
+app.use('/api/v1/auth', authLimiter, authRoutes);
+app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/addresses', addressRoutes);
+app.use('/api/v1/cart', cartRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // 6. 404 Handler
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({ error: "Route not found" });
+  res.status(404).json({ error: 'Route not found' });
 });
 
 // 7. Global Error Handler (must be last)
