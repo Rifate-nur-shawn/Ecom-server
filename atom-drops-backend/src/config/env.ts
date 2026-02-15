@@ -17,6 +17,7 @@ const envSchema = z.object({
     .string()
     .min(32, "JWT_SECRET must be at least 32 characters for security"),
   FRONTEND_URL: z.string().url().default("http://localhost:5173"),
+  FRONTEND_URLS: z.string().optional(),
 });
 
 // Validate the environment

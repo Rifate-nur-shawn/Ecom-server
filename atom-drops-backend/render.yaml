@@ -3,7 +3,7 @@ services:
     name: atom-drops-backend
     env: node
     plan: free
-    buildCommand: npm install && npm run build && npx prisma generate
+    buildCommand: npm ci --include=dev && npm run build && npx prisma generate
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -13,6 +13,8 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: FRONTEND_URL
+        value: https://atom-drops-frontend.vercel.app
+      - key: FRONTEND_URLS
         value: https://atom-drops-frontend.vercel.app
       - key: CLOUDINARY_API_KEY
         sync: false
