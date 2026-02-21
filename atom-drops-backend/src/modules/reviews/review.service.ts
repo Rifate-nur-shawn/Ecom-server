@@ -107,10 +107,10 @@ export const getProductReviews = async (
   ]);
 
   // Calculate average rating
-  const totalReviews = stats.reduce((sum, s) => sum + s._count, 0);
+  const totalReviews = stats.reduce((sum: number, s: { rating: number; _count: number }) => sum + s._count, 0);
   const averageRating =
     totalReviews > 0
-      ? stats.reduce((sum, s) => sum + s.rating * s._count, 0) / totalReviews
+      ? stats.reduce((sum: number, s: { rating: number; _count: number }) => sum + s.rating * s._count, 0) / totalReviews
       : 0;
 
   // Rating distribution
@@ -121,7 +121,7 @@ export const getProductReviews = async (
     2: 0,
     1: 0,
   };
-  stats.forEach((s) => {
+  stats.forEach((s: { rating: number; _count: number }) => {
     ratingDistribution[s.rating as keyof typeof ratingDistribution] = s._count;
   });
 

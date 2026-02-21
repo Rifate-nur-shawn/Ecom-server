@@ -3,7 +3,7 @@ services:
     name: atom-drops-backend
     env: node
     plan: free
-    buildCommand: npm ci --include=dev && npm run build && npx prisma generate
+    buildCommand: npm ci && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
